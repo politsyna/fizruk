@@ -5,24 +5,38 @@
  * Module.
  */
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+
 /**
- * Implements hook_theme().
+ * Presave.
  */
-function fizruk_theme() {
-  return [
-    'fizruk-tpl' => [
-      'template' => 'fizruk',
-      'variables' => ['data' => []],
-    ],
-  ];
+function fizruk_entity_presave(EntityInterface $entity) {
+  if (method_exists($entity, 'getType') && $entity->getType() == 'result') {
+    $entity->title->setValue(date('d-M-Y'));
+  }
 }
 
 /**
- * Implements hook_theme_suggestions_HOOK() for fizruk.tpl.php.
+ * Form Alter.
  */
-function fizruk_theme_suggestions_fizruk(array $variables) {
-  $suggestions = [];
-  $suggestions[] = 'fizruk';
+function fizruk_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form_id == 'views_exposed_form') {
+    $form["field_result_date_value"]['#type'] = 'date';
+    $form["field_result_date_value_1"]['#type'] = 'date';
+  }
+}
 
-  return $suggestions;
+/**
+ * Views pre_render.
+ */
+function fizruk_views_pre_render($view) {
+  $results = [];
+  foreach ($view->result as $key => $value) {
+    $results[$value->nid] = [
+      'nid' => $value->nid,
+      'date' => $value->node__field_result_date_field_result_date_value,
+    ];
+  }
+  //dsm($results);
 }
