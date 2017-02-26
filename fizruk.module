@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * @file
+ * Module.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function fizruk_theme() {
+  return [
+    'fizruk-tpl' => [
+      'template' => 'fizruk',
+      'variables' => ['data' => []],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK() for fizruk.tpl.php.
+ */
+function fizruk_theme_suggestions_fizruk(array $variables) {
+  $suggestions = [];
+  $suggestions[] = 'fizruk';
+
+  return $suggestions;
+}

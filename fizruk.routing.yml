@@ -1,0 +1,15 @@
+fizruk.main:
+  path: '/fizruk'
+  defaults:
+    _controller: '\Drupal\fizruk\Controller\PageMain::page'
+    _title: 'Физрук'
+  requirements:
+    _permission: 'access content'
+
+fizruk.results:
+  path: '/fizruk/results'
+  defaults:
+    _controller: '\Drupal\fizruk\Controller\PageResults::page'
+    _title: 'Результаты'
+  requirements:
+    _permission: 'access content'
