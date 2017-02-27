@@ -32,21 +32,66 @@ function fizruk_form_alter(&$form, FormStateInterface $form_state, $form_id) {
  * Views pre_render.
  */
 function fizruk_views_pre_render($view) {
-  $results = [];
+
   //dsm($view->result);
-  foreach ($view->result as $key => $value) {
-    $results[$value->nid] = [
-      'nid' => $value->nid,
-      'date' => $value->node__field_result_date_field_result_date_value,
-    ];
+  $view_id = $view->element['#view_id'];
+  if ($view_id == 'result') {
+    $results = [];
+    foreach ($view->result as $key => $value) {
+      $results[$value->nid] = [
+        'nid' => $value->nid,
+        'date' => $value->node__field_result_date_field_result_date_value,
+      ];
+    }
+    //dsm($results);
+    $itogo_distance = 0;
+    $itogo_time = 0;
+    $sred_ves = 0;
+    foreach ($results as $nid => $value) {
+      $node = Node::load($nid);
+      $uid = $node->uid->entity->id();
+      $distance = $node->field_result_distance->value;
+      $itogo_distance = $itogo_distance + $distance;
+      $time = $node->field_result_time->value;
+      $itogo_time = $itogo_time + $time;
+      $chas = $itogo_time / 60;
+      $ves = $node->field_result_ves->value;
+      $sred_ves = $sred_ves + $ves;
+    }
+    $text1 = "За " . count($results);
+    $text2 = " вы прошли " . $itogo_distance . " км,
+    потратив на это " . $itogo_time . " мин. (что равно " . round($chas, 2) . " час.).";
+    if (count($results) == 1 || count($results) == 2 || count($results) == 3 || count($results) == 4) {
+      drupal_set_message($text1 . " дня" . $text2);
+    } else {
+      drupal_set_message($text1 . " дней" . $text2);
+    }
+    drupal_set_message("Ваш средний вес: " . round($sred_ves / count($results), 2) . " кг");
   }
-  //dsm($results);
-  $itogo_distance = 0;
-  foreach ($results as $nid => $value) {
-    $node = Node::load($nid);
-    $uid = $node->uid->entity->id();
-    $distance = $node->field_result_distance->value;
-    $itogo_distance = $itogo_distance + $distance;
-  }
-  drupal_set_message("итоговая дистанция: " . $itogo_distance);
+
 }
+
+/*$to  = "v.politsyna@yandex.ru ";
+$subject = "Физрук";
+$message = '
+<html>
+    <head>
+        <title>Кто-то открыл страницу результатов</title>
+    </head>
+    <body>
+        <p>а-а-а-а!!!</p>
+    </body>
+</html>';
+
+$headers  = "Content-type: text/html; charset=utf-8 \n";
+$headers .= "From: webmaster@insaitov.ru\n";
+
+$mail = mail($to, $subject, $message, $headers);
+dsm($mail);
+if ($mail){
+  drupal_set_message("Ваше сообщение отправлено");
+}
+else{
+  drupal_set_message("Ошибка отправки", "error");
+}
+*/
